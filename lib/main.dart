@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Delivery App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: colorBtn),
-      home: HomeSignUpCompleted(),
+      home: HomeAuth(),
     );
   }
 }
@@ -139,7 +139,8 @@ class HomeAuth extends StatelessWidget {
 
 //Pagina Login
 class HomeSignIn extends StatefulWidget {
-  const HomeSignIn({Key key}) : super(key: key);
+  final email;
+  const HomeSignIn({Key key, this.email}) : super(key: key);
 
   @override
   _HomeSignInState createState() => _HomeSignInState();
@@ -152,6 +153,14 @@ class _HomeSignInState extends State<HomeSignIn> {
   final pass1TfController = TextEditingController();
 
   bool _obscurePass = true;
+
+  @override
+  void initState() {
+    if (widget.email != null) {
+      emailTfController.text = widget.email;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -245,11 +254,21 @@ class _HomeSignInState extends State<HomeSignIn> {
                         ))),
                     onPressed: () {
                       print("Pressed ACCEDI");
-
-                      //Services.nuovoUtente("Armando", "Sacco", "Focah", "mr.armando.sacco@gmail.com", "Sacchetto", "3914934187");
-
                       if (_formKey.currentState.validate()) {
                         print("Validato");
+                        var email = emailTfController.text;
+                        var password = pass1TfController.text;
+                        Services.accesso(email, password).then((value) {
+                          if (value.contains("Login effettuato")) {
+                            print("Loggato");
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomePage(
+                                          email: email,
+                                        )));
+                          }
+                        });
                       }
                     },
                     child: Text(
@@ -771,7 +790,7 @@ class _HomeSignUpSecondState extends State<HomeSignUpSecond> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => HomeSignUpCompleted(
-                                        user: widget.user)));
+                                        email: widget.email)));
                           } else {
                             print("Errore in registrazione");
                           }
@@ -887,8 +906,8 @@ class _HomeSignUpSecondState extends State<HomeSignUpSecond> {
 
 //Pagina Registrazione completa
 class HomeSignUpCompleted extends StatelessWidget {
-  final user;
-  const HomeSignUpCompleted({Key key, this.user}) : super(key: key);
+  final email;
+  const HomeSignUpCompleted({Key key, this.email}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -948,7 +967,11 @@ class HomeSignUpCompleted extends StatelessWidget {
               //GreenIcon
               Positioned(
                 top: size.height * 0.35,
-                child: Icon(Icons.done_outline_sharp, color: colorGreen, size: 80,),
+                child: Icon(
+                  Icons.done_outline_sharp,
+                  color: colorGreen,
+                  size: 80,
+                ),
               ),
 
               //BtnToLogin
@@ -960,15 +983,19 @@ class HomeSignUpCompleted extends StatelessWidget {
                 child: ElevatedButton(
                   style: ButtonStyle(
                       backgroundColor:
-                      MaterialStateProperty.all<Color>(colorBtn),
+                          MaterialStateProperty.all<Color>(colorBtn),
                       shape: MaterialStateProperty.all(RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                         side: BorderSide(color: colorBtnDark),
                       ))),
                   onPressed: () {
                     print("Pressed Sign In");
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => HomeSignIn()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => HomeSignIn(
+                                  email: email,
+                                )));
                   },
                   child: Text(
                     "ACCEDI",
@@ -985,5 +1012,31 @@ class HomeSignUpCompleted extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  final email;
+  const HomePage({Key key, this.email}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
+    return WillPopScope(
+        onWillPop: () {
+          return null;
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: Container(
+            width: size.width,
+            height: size.height,
+            color: colorBgApp,
+            child: Center(
+              child: Text(email),
+            ),
+          ),
+        ));
   }
 }

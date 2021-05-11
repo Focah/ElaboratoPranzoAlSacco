@@ -6,6 +6,7 @@ class Services {
   static const ROOT = 'https://www.bushido-team.com/Elaborato/service.php';
 
   static const _NUOVO_UTENTE = 'NUOVO_UTENTE';
+  static const _ACCESSO = 'ACCESSO';
 
   /*
   static List<Progetto> parseResponseProgetto(String responseBody){
@@ -24,6 +25,7 @@ class Services {
       map['email'] = email;
       map['password'] = password;
       map['numero_cell'] = numero_cell;
+
       var url = Uri.parse(ROOT);
       final response = await http.post(url, body: map);
 
@@ -31,7 +33,25 @@ class Services {
       print('Response body: ${response.body}');
       return response.body;
     } catch (e) {
-      return "error"; // Return an empty list on exception
+      return "errore"; // Return an empty list on exception
+    }
+  }
+
+  static Future<String> accesso(String email, String password) async{
+    try{
+      var map = Map<String, dynamic>();
+      map['action'] = _ACCESSO;
+      map['email'] = email;
+      map['password'] = password;
+
+      var url = Uri.parse(ROOT);
+      final response = await http.post(url, body: map);
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      return response.body;
+    }catch(e){
+      return "errore";
     }
   }
 }

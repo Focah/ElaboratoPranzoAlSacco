@@ -11,3 +11,9 @@ const colorBg = Color(0xFFFB8B24);
 const colorGreen = Color(0xFFC0CE64);
 
 const colorBgApp = Color(0xFFF3F4F6);
+
+const LinearGradient containerGradient = LinearGradient(
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+    colors: [colorBg, Color(0xfffb5d24)]
+);

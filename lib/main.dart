@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:io';
 import 'consts.dart';
 import 'services/services.dart';
@@ -57,7 +61,7 @@ class HomeAuth extends StatelessWidget {
                 right: 0,
                 child: Container(
                   decoration: BoxDecoration(
-                      color: colorBg,
+                      gradient: containerGradient,
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(50),
                           topRight: Radius.circular(50))),
@@ -219,7 +223,7 @@ class _HomeSignInState extends State<HomeSignIn> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                          color: colorBg,
+                          gradient: containerGradient,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50),
                               topRight: Radius.circular(50))),
@@ -441,11 +445,10 @@ class _HomeSignUpFirstState extends State<HomeSignUpFirst> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                          color: colorBg,
+                          gradient: containerGradient,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50),
                               topRight: Radius.circular(50))),
-                      //color: Color(0xFF4058DB),
                       width: size.width,
                       height: size.height * 0.08,
                       child: Center(
@@ -739,11 +742,10 @@ class _HomeSignUpSecondState extends State<HomeSignUpSecond> {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                          color: colorBg,
+                          gradient: containerGradient,
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50),
                               topRight: Radius.circular(50))),
-                      //color: Color(0xFF4058DB),
                       width: size.width,
                       height: size.height * 0.08,
                       child: Center(
@@ -1015,9 +1017,71 @@ class HomeSignUpCompleted extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+//HomePage dopo login
+class HomePage extends StatefulWidget {
   final email;
   const HomePage({Key key, this.email}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final posRistorante = LatLng(45.537918, 9.423339);
+  Set<Marker> _markers = {};
+  BitmapDescriptor mapMarker;
+
+  void setCustomMarker() async {
+    mapMarker = await BitmapDescriptor.fromAssetImage(
+        ImageConfiguration(), 'images/Logo.png');
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    setState(() {
+      _markers.add(Marker(
+          markerId: MarkerId('1'),
+          position: posRistorante,
+          //icon: mapMarker,
+          infoWindow: InfoWindow(
+              title: "Pranzo al Sacco", snippet: "Posizione del ristorante")));
+    });
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+
+  @override
+  void initState() {
+    //setCustomMarker();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1033,10 +1097,52 @@ class HomePage extends StatelessWidget {
             width: size.width,
             height: size.height,
             color: colorBgApp,
-            child: Center(
-              child: Text(email),
+            child: Stack(
+              alignment: AlignmentDirectional.center,
+              children: [
+                Positioned(
+                  child: GoogleMap(
+                    onMapCreated: _onMapCreated,
+                    markers: _markers,
+                    initialCameraPosition:
+                        CameraPosition(target: posRistorante, zoom: 15),
+                  ),
+                ),
+                Positioned(
+                  bottom: size.height * 0.05,
+                  child: Container(
+                    height: 50.0,
+                    margin: EdgeInsets.all(10),
+                    child: RaisedButton(
+                      onPressed: () {},
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(80.0)),
+                      padding: EdgeInsets.all(0.0),
+                      child: Ink(
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [colorBtnDark, colorBtn],
+                            ),
+                            borderRadius: BorderRadius.circular(30.0)),
+                        child: Container(
+                          constraints:
+                          BoxConstraints(maxWidth: 250.0, minHeight: 50.0),
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Ordina",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: 30, fontFamily: 'Itim'),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
           ),
         ));
   }
 }
+
+

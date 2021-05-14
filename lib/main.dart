@@ -1100,6 +1100,7 @@ class _HomePageState extends State<HomePage> {
             child: Stack(
               alignment: AlignmentDirectional.center,
               children: [
+                //Mappa
                 Positioned(
                   child: GoogleMap(
                     onMapCreated: _onMapCreated,
@@ -1108,31 +1109,36 @@ class _HomePageState extends State<HomePage> {
                         CameraPosition(target: posRistorante, zoom: 15),
                   ),
                 ),
+
+                //OrdinaBtn
                 Positioned(
                   bottom: size.height * 0.05,
                   child: Container(
                     height: 50.0,
                     margin: EdgeInsets.all(10),
-                    child: RaisedButton(
+                    child: ElevatedButton(
                       onPressed: () {},
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(80.0)),
-                      padding: EdgeInsets.all(0.0),
-                      child: Ink(
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(80.0)),
+                        padding: EdgeInsets.all(0.0),
+                      ),
+                      child: Container(
                         decoration: BoxDecoration(
                             gradient: LinearGradient(
-                              colors: [colorBtnDark, colorBtn],
+                              colors: [Color(0xff751815), colorBtn],
                             ),
                             borderRadius: BorderRadius.circular(30.0)),
-                        child: Container(
-                          constraints:
-                          BoxConstraints(maxWidth: 250.0, minHeight: 50.0),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Ordina",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 30, fontFamily: 'Itim'),
-                          ),
+                        constraints:
+                            BoxConstraints(maxWidth: 250.0, minHeight: 50.0),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Ordina",
+                          textAlign: TextAlign.justify,
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 30,
+                              fontFamily: 'Itim'),
                         ),
                       ),
                     ),
@@ -1144,5 +1150,3 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 }
-
-

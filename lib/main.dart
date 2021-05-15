@@ -20,7 +20,9 @@ class MyApp extends StatelessWidget {
       title: 'Delivery App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: colorBtn),
-      home: HomeAuth(),
+      home: HomeOrdine(
+        email: "mr.armando.sacco@gmail.com",
+      ),
     );
   }
 }
@@ -781,9 +783,9 @@ class _HomeSignUpSecondState extends State<HomeSignUpSecond> {
                         print("Validato e procedo alla registrazione");
                         var nome = nomeTfController.text;
                         var cognome = cognomeTfController.text;
-                        var numero_cell = numeroCellTfController.text;
+                        var numeroCell = numeroCellTfController.text;
                         Services.nuovoUtente(nome, cognome, widget.user,
-                                widget.email, widget.pass, numero_cell)
+                                widget.email, widget.pass, numeroCell)
                             .then((value) {
                           if (value.contains("Aggiunto utente")) {
                             print("procedo alla prossima pagina");
@@ -1179,11 +1181,16 @@ class _HomePageState extends State<HomePage> {
                           print("Distance: $distance m");
                           setState(() {
                             if (distance <= raggioConsegna) {
-                              show = true;
-                              testo = "Puoi ordinare!";
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => HomeOrdine(
+                                            email: widget.email,
+                                          )));
                             } else {
                               show = true;
-                              testo = "Non puoi ordinare! Sei fuori dal raggio di consegna del ristorante";
+                              testo =
+                                  "Non puoi ordinare! Sei fuori dal raggio di consegna del ristorante";
                             }
                           });
                         });
@@ -1237,3 +1244,88 @@ class _HomePageState extends State<HomePage> {
         ));
   }
 }
+
+//Pagina per creare il proprio ordine
+class HomeOrdine extends StatelessWidget {
+  final email;
+  const HomeOrdine({Key key, this.email}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+
+    return WillPopScope(
+        onWillPop: () {
+          return null;
+        },
+        child: Scaffold(
+          resizeToAvoidBottomInset: false,
+          body: Container(
+            width: size.width,
+            height: size.height,
+            color: colorBgApp,
+            child: Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  child: Container(
+                    width: size.width,
+                    height: size.height * 0.05 + 70,
+                    color: colorBgApp,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 50.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          IconButton(
+                            onPressed: () {},
+                            icon: Icon(Icons.home),
+                            color: colorBtn,
+                            iconSize: 30,
+                          ),
+                          Column(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Pranzo al Sacco",
+                                style: TextStyle(color: colorBtn, fontSize: 25),
+                              ),
+                              SizedBox(height: size.height * 0.005,),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.timer,
+                                    color: Colors.grey,
+                                  ),
+                                  Text(
+                                    " 13:00 - 13:30",
+                                    style: TextStyle(
+                                        color: Colors.grey, fontSize: 18),
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.account_circle,
+                              color: colorBtn,
+                            ),
+                            iconSize: 30,
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ));
+  }
+}
+
+//https://i.pinimg.com/originals/da/85/ef/da85ef1ffa269927371bd5e511a408ec.png

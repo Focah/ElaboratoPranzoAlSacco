@@ -1265,6 +1265,7 @@ class HomeOrdine extends StatelessWidget {
             height: size.height,
             color: colorBgApp,
             child: Stack(
+              alignment: Alignment.center,
               children: [
                 Positioned(
                   top: 0,
@@ -1277,47 +1278,89 @@ class HomeOrdine extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.max,
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [],
+                      ),
+                    ),
+                  ),
+                ),
+
+                //TopLeft icon
+                Positioned(
+                  top: size.height * 0.060,
+                  left: size.width * 0.05,
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(Icons.home),
+                    color: colorBtn,
+                    iconSize: 40,
+                  ),
+                ),
+
+                //TopRight icon
+                Positioned(
+                  top: size.height * 0.060,
+                  right: size.width * 0.05,
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.account_circle,
+                      color: colorBtn,
+                    ),
+                    iconSize: 40,
+                  ),
+                ),
+
+                //TopText
+                Positioned(
+                  top: size.height * 0.06,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Pranzo al Sacco",
+                        style: TextStyle(
+                            color: colorBtn, fontSize: 25, fontFamily: 'Itim'),
+                      ),
+                      SizedBox(
+                        height: size.height * 0.005,
+                      ),
+                      Row(
                         children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.home),
-                            color: colorBtn,
-                            iconSize: 30,
+                          Icon(
+                            Icons.timer,
+                            color: Colors.grey,
                           ),
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Pranzo al Sacco",
-                                style: TextStyle(color: colorBtn, fontSize: 25),
-                              ),
-                              SizedBox(height: size.height * 0.005,),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.timer,
-                                    color: Colors.grey,
-                                  ),
-                                  Text(
-                                    " 13:00 - 13:30",
-                                    style: TextStyle(
-                                        color: Colors.grey, fontSize: 18),
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.account_circle,
-                              color: colorBtn,
-                            ),
-                            iconSize: 30,
+                          Text(
+                            " 13:00 - 13:30",
+                            style: TextStyle(
+                                color: Colors.grey,
+                                fontSize: 18,
+                                fontFamily: 'Itim'),
                           )
                         ],
-                      ),
+                      )
+                    ],
+                  ),
+                ),
+
+                //MainContainer
+                Positioned(
+                  top: size.height * 0.20,
+                  child: Container(
+                    height: size.height * 0.80,
+                    width: size.width * 0.95,
+                    child: Column(
+                      children: [
+                        Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text("Pizze", style: TextStyle(
+                              color: colorBtn,
+                              fontSize: 25,
+                              fontFamily: 'Itim'
+                            ),)),
+                        PizzeListView()
+                      ],
                     ),
                   ),
                 )
@@ -1325,6 +1368,66 @@ class HomeOrdine extends StatelessWidget {
             ),
           ),
         ));
+  }
+}
+
+class PizzeListView extends StatelessWidget {
+  const PizzeListView({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: FutureBuilder(
+        future: Services.pietanzaDaCategoria(0),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.none &&
+              snapshot.hasData == null) {
+            return CircularProgressIndicator();
+          }
+          return Scrollbar(
+            isAlwaysShown: true,
+            child: ListView.builder(
+              padding: const EdgeInsets.only(top: 10.0),
+              shrinkWrap: true,
+              scrollDirection: Axis.vertical,
+              itemCount: snapshot.data.length,
+              itemBuilder: (context, index) {
+                Pietanza p = snapshot.data[index];
+                return Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.3),
+                        spreadRadius: 5,
+                        blurRadius: 10
+                      )
+                    ]
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                    child: ListTile(
+                      tileColor: Colors.white,
+                      title: Text(p.nome),
+                      subtitle: Text("prova"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("${p.prezzo.toString()} €"),
+                          IconButton(icon: Icon(Icons.add_circle_outline, color: colorBtn,), iconSize: 40,)
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          );
+        },
+      ),
+    );
   }
 }
 

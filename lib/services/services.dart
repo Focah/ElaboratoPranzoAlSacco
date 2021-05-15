@@ -8,6 +8,8 @@ class Services {
 
   static const _NUOVO_UTENTE = 'NUOVO_UTENTE';
   static const _ACCESSO = 'ACCESSO';
+  static const _ALL_CLIENTI = 'ALL_CLIENTI';
+  static const _PIETANZA_DA_CATEGORIA = 'PIETANZA_DA_CATEGORIA';
 
   /*
   static List<Progetto> parseResponseProgetto(String responseBody){
@@ -59,7 +61,7 @@ class Services {
   static Future<List<Cliente>> allClienti() async{
     try{
       var map = Map<String, dynamic>();
-      map['action'] = "ALL_CLIENTI";
+      map['action'] = _ALL_CLIENTI;
 
       var url = Uri.parse(ROOT);
       final response = await http.post(url, body: map);
@@ -77,6 +79,34 @@ class Services {
       }
 
       return clienti;
+    }catch(e){
+      print(e);
+      return [];
+    }
+  }
+
+  static Future<List<Pietanza>> pietanzaDaCategoria(int categoria) async{
+    try{
+      var map = Map<String, dynamic>();
+      map['action'] = _PIETANZA_DA_CATEGORIA;
+      map['categoria'] = categoria.toString();
+
+      var url = Uri.parse(ROOT);
+      final response = await http.post(url, body: map);
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
+      var jsonData = json.decode(response.body);
+
+      List<Pietanza> pietanze = [];
+
+      for(var p in jsonData){
+        Pietanza pietanza = Pietanza(int.parse(p['pietanza_id']), p['nome'], int.parse(p['porzione']), int.parse(p['categoria']), double.parse(p['prezzo']), int.parse(p['sconto']), p['intolleranze'], p['immagine']);
+        pietanze.add(pietanza);
+      }
+
+      return pietanze;
     }catch(e){
       print(e);
       return [];
@@ -101,4 +131,17 @@ class Cliente{
   final int stato;
 
   Cliente(this.cliente_id, this.nome, this.cognome, this.username, this.email, this.numero_cell, this.verificato, this.numero_ordini, this.stato);
+}
+
+class Pietanza{
+  final int pietanza_id;
+  final String nome;
+  final int porzione;
+  final int categoria;
+  final double prezzo;
+  final int sconto;
+  final String intolleranze;
+  final String immagine;
+
+  Pietanza(this.pietanza_id, this.nome, this.porzione, this.categoria, this.prezzo, this.sconto, this.intolleranze, this.immagine);
 }

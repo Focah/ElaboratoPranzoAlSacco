@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       title: 'Delivery App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: colorBtn),
-      home: HomePage(),
+      home: HomeAuth(),
     );
   }
 }

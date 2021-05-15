@@ -1,4 +1,5 @@
-import 'dart:convert';
+import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       title: 'Delivery App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: colorBtn),
-      home: HomeAuth(),
+      home: HomePage(),
     );
   }
 }
@@ -1027,26 +1028,54 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final posRistorante = LatLng(45.537918, 9.423339);
-  Set<Marker> _markers = {};
+  static final posRistorante = LatLng(45.537918, 9.423339);
+  static final double raggioConsegna = 1000;
   BitmapDescriptor mapMarker;
+  Timer timer;
+  String testo = "";
+  bool show = false;
 
+  Set<Marker> _markers = {
+    Marker(
+        markerId: MarkerId('0'),
+        position: posRistorante,
+        //icon: mapMarker,
+        infoWindow: InfoWindow(
+            title: "Pranzo al Sacco", snippet: "Posizione del ristorante"))
+  };
+
+  Set<Circle> _circles = {
+    Circle(
+        circleId: CircleId("0"),
+        center: posRistorante,
+        radius: raggioConsegna,
+        fillColor: colorBtn.withOpacity(.1),
+        strokeColor: colorBtn.withOpacity(.8),
+        strokeWidth: 2)
+  };
+
+  //Icona personalizzata per un marker
   void setCustomMarker() async {
     mapMarker = await BitmapDescriptor.fromAssetImage(
         ImageConfiguration(), 'images/Logo.png');
   }
 
   void _onMapCreated(GoogleMapController controller) {
+    print("Mappa creata");
+  }
+
+  //Aggiunge un marker sulla mappa
+  void _addMarker(LatLng pos, String id, String title, String snippet) {
     setState(() {
       _markers.add(Marker(
-          markerId: MarkerId('1'),
-          position: posRistorante,
+          markerId: MarkerId(id),
+          position: pos,
           //icon: mapMarker,
-          infoWindow: InfoWindow(
-              title: "Pranzo al Sacco", snippet: "Posizione del ristorante")));
+          infoWindow: InfoWindow(title: title, snippet: snippet)));
     });
   }
 
+  //Prende la posizione del telefono
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -1077,9 +1106,28 @@ class _HomePageState extends State<HomePage> {
         desiredAccuracy: LocationAccuracy.high);
   }
 
+  //Calcola la distanza tra due posizioni
+  double calculateDistance(lat1, lon1, lat2, lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a = 0.5 -
+        c((lat2 - lat1) * p) / 2 +
+        c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
+
   @override
   void initState() {
     //setCustomMarker();
+
+    timer = Timer.periodic(Duration(seconds: 3), (Timer t) {
+      _markers.removeWhere((element) => element.markerId == MarkerId("user"));
+
+      _determinePosition().then((value) {
+        _addMarker(LatLng(value.latitude, value.longitude), "user",
+            "Posizione utente", "Marker per la posizione dell'utente");
+      });
+    });
     super.initState();
   }
 
@@ -1093,6 +1141,7 @@ class _HomePageState extends State<HomePage> {
         },
         child: Scaffold(
           resizeToAvoidBottomInset: false,
+          //appBar: AppBar(),
           body: Container(
             width: size.width,
             height: size.height,
@@ -1105,8 +1154,9 @@ class _HomePageState extends State<HomePage> {
                   child: GoogleMap(
                     onMapCreated: _onMapCreated,
                     markers: _markers,
+                    circles: _circles,
                     initialCameraPosition:
-                        CameraPosition(target: posRistorante, zoom: 15),
+                        CameraPosition(target: posRistorante, zoom: 14),
                   ),
                 ),
 
@@ -1117,7 +1167,27 @@ class _HomePageState extends State<HomePage> {
                     height: 50.0,
                     margin: EdgeInsets.all(10),
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        //Al click del bottone calcola la distanza tra il ristorante e la posizione dell'utente
+                        _determinePosition().then((value) {
+                          var distance = (1000 *
+                              calculateDistance(
+                                  value.latitude,
+                                  value.longitude,
+                                  posRistorante.latitude,
+                                  posRistorante.longitude));
+                          print("Distance: $distance m");
+                          setState(() {
+                            if (distance <= raggioConsegna) {
+                              show = true;
+                              testo = "Puoi ordinare!";
+                            } else {
+                              show = true;
+                              testo = "Non puoi ordinare! Sei fuori dal raggio di consegna del ristorante";
+                            }
+                          });
+                        });
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(80.0)),
@@ -1143,7 +1213,24 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                )
+                ),
+
+                //Testo in sovraimpressione
+                Visibility(
+                  visible: show,
+                  child: Positioned(
+                    top: size.height * 0.18,
+                    child: Container(
+                        width: size.width * 0.75,
+                        child: Text(
+                          testo,
+                          style: TextStyle(
+                            fontFamily: 'Itim',
+                            fontSize: 30,
+                          ),
+                        )),
+                  ),
+                ),
               ],
             ),
           ),

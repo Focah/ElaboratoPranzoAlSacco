@@ -20,8 +20,8 @@ class MyApp extends StatelessWidget {
       title: 'Delivery App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: colorBtn),
-      home: HomeOrdine(
-        email: "mr.armando.sacco@gmail.com",
+      home: HomeAuth(
+        //email: "mr.armando.sacco@gmail.com",
       ),
     );
   }
@@ -1246,9 +1246,17 @@ class _HomePageState extends State<HomePage> {
 }
 
 //Pagina per creare il proprio ordine
-class HomeOrdine extends StatelessWidget {
+class HomeOrdine extends StatefulWidget {
   final email;
   const HomeOrdine({Key key, this.email}) : super(key: key);
+
+  @override
+  _HomeOrdineState createState() => _HomeOrdineState();
+}
+
+class _HomeOrdineState extends State<HomeOrdine> {
+  bool _dark = false;
+  double _opacity = 0.5;
 
   @override
   Widget build(BuildContext context) {
@@ -1301,6 +1309,7 @@ class HomeOrdine extends StatelessWidget {
                   top: size.height * 0.060,
                   right: size.width * 0.05,
                   child: IconButton(
+                    onPressed: () {},
                     icon: Icon(
                       Icons.account_circle,
                       color: colorBtn,
@@ -1346,24 +1355,183 @@ class HomeOrdine extends StatelessWidget {
 
                 //MainContainer
                 Positioned(
-                  top: size.height * 0.20,
+                  bottom: size.height * 0.1,
                   child: Container(
-                    height: size.height * 0.80,
+                    height: size.height * 0.75,
                     width: size.width * 0.95,
-                    child: Column(
-                      children: [
-                        Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text("Pizze", style: TextStyle(
-                              color: colorBtn,
-                              fontSize: 25,
-                              fontFamily: 'Itim'
-                            ),)),
-                        PizzeListView()
-                      ],
+                    child:
+                        NotificationListener<OverscrollIndicatorNotification>(
+                      onNotification: (overscroll) {
+                        overscroll.disallowGlow();
+                        return null;
+                      },
+                      child: ListView(
+                        children: [
+                          //Pizze
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 18),
+                                child: Text(
+                                  "Pizze",
+                                  style: TextStyle(
+                                      color: colorBtn,
+                                      fontSize: 25,
+                                      fontFamily: 'Itim'),
+                                ),
+                              )),
+                          CatListView(
+                            cat: 0,
+                          ),
+
+                          //Contorni
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 18, top: 5),
+                                child: Text(
+                                  "Contorni",
+                                  style: TextStyle(
+                                      color: colorBtn,
+                                      fontSize: 25,
+                                      fontFamily: 'Itim'),
+                                ),
+                              )),
+                          CatListView(
+                            cat: 1,
+                          ),
+
+                          //Secondi
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 18, top: 5),
+                                child: Text(
+                                  "Secondi",
+                                  style: TextStyle(
+                                      color: colorBtn,
+                                      fontSize: 25,
+                                      fontFamily: 'Itim'),
+                                ),
+                              )),
+                          CatListView(
+                            cat: 2,
+                          ),
+
+                          //Bibite
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 18, top: 5),
+                                child: Text(
+                                  "Bibite",
+                                  style: TextStyle(
+                                      color: colorBtn,
+                                      fontSize: 25,
+                                      fontFamily: 'Itim'),
+                                ),
+                              )),
+                          CatListView(
+                            cat: 3,
+                          ),
+
+                          //Dolci
+                          Align(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 18, top: 5),
+                                child: Text(
+                                  "Dolci",
+                                  style: TextStyle(
+                                      color: colorBtn,
+                                      fontSize: 25,
+                                      fontFamily: 'Itim'),
+                                ),
+                              )),
+                          CatListView(
+                            cat: 4,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                )
+                ),
+
+                //DarkBg
+                Visibility(
+                  visible: _dark,
+                  child: Container(
+                    color: Colors.black.withOpacity(_opacity),
+                  ),
+                ),
+
+                NotificationListener<DraggableScrollableNotification>(
+                  onNotification:
+                      (DraggableScrollableNotification DSNotification) {
+                    setState(() {
+                      if (DSNotification.extent == 0.1) {
+                        _dark = false;
+                      } else {
+                        _dark = true;
+                      }
+                      _opacity = DSNotification.extent;
+                    });
+                    return null;
+                  },
+                  child: DraggableScrollableSheet(
+                    initialChildSize: 0.1,
+                    minChildSize: 0.1,
+                    maxChildSize: 0.5,
+                    builder: (context, scrollController) {
+                      return NotificationListener<OverscrollIndicatorNotification>(
+                        onNotification: (overscroll) {
+                          overscroll.disallowGlow();
+                          return null;
+                        },
+                        child: SingleChildScrollView(
+                          physics: ClampingScrollPhysics(),
+                          controller: scrollController,
+                          child: Container(
+                            width: size.width,
+                            height: size.height * 0.49,
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(30),
+                                  topRight: Radius.circular(30)),
+                              gradient: LinearGradient(
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  colors: [colorBgApp, Colors.white]),
+                            ),
+                            child: Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                //Top rectangle drawing
+                                Positioned(
+                                  top: size.height * 0.01,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey,
+                                      borderRadius: BorderRadius.all(Radius.circular(15)),
+                                    ),
+
+                                    width: size.width * 0.2,
+                                    height: 8,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
               ],
             ),
           ),
@@ -1371,62 +1539,59 @@ class HomeOrdine extends StatelessWidget {
   }
 }
 
-class PizzeListView extends StatelessWidget {
-  const PizzeListView({
-    Key key,
-  }) : super(key: key);
+class CatListView extends StatelessWidget {
+  final cat;
+  const CatListView({Key key, this.cat}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: FutureBuilder(
-        future: Services.pietanzaDaCategoria(0),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.none &&
-              snapshot.hasData == null) {
-            return CircularProgressIndicator();
-          }
-          return Scrollbar(
-            isAlwaysShown: true,
-            child: ListView.builder(
-              padding: const EdgeInsets.only(top: 10.0),
-              shrinkWrap: true,
-              scrollDirection: Axis.vertical,
-              itemCount: snapshot.data.length,
-              itemBuilder: (context, index) {
-                Pietanza p = snapshot.data[index];
-                return Container(
-                  margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-                  decoration: BoxDecoration(
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 5,
-                        blurRadius: 10
+    return FutureBuilder(
+      future: Services.pietanzaDaCategoria(cat),
+      builder: (context, snapshot) {
+        return ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+
+          itemCount: snapshot.data.length,
+          itemBuilder: (context, index) {
+            Pietanza p = snapshot.data[index];
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 5,
+                    blurRadius: 10)
+              ]),
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                child: ListTile(
+                  tileColor: Colors.white,
+                  title: Text(p.nome),
+                  subtitle: Text("Qt. 0"),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("${p.prezzo.toString()} €"),
+                      IconButton(
+                        onPressed: () {
+                          print(p.nome);
+                        },
+                        icon: Icon(
+                          Icons.add_circle_outline,
+                          color: colorBtn,
+                        ),
+                        iconSize: 40,
                       )
-                    ]
+                    ],
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(15)),
-                    child: ListTile(
-                      tileColor: Colors.white,
-                      title: Text(p.nome),
-                      subtitle: Text("prova"),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text("${p.prezzo.toString()} €"),
-                          IconButton(icon: Icon(Icons.add_circle_outline, color: colorBtn,), iconSize: 40,)
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

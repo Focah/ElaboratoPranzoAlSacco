@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:elaborato_delivery_app/main.dart';
 
 class Services {
   static const ROOT = 'https://www.bushido-team.com/Elaborato/service.php';
@@ -94,8 +92,8 @@ class Services {
       var url = Uri.parse(ROOT);
       final response = await http.post(url, body: map);
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
+      //print('Response status: ${response.statusCode}');
+      //print('Response body: ${response.body}');
 
       var jsonData = json.decode(response.body);
 

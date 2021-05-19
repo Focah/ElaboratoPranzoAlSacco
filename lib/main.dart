@@ -20,8 +20,8 @@ class MyApp extends StatelessWidget {
       title: 'Delivery App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primaryColor: colorBtn),
-      home: HomeAuth(
-        //email: "mr.armando.sacco@gmail.com",
+      home: HomeOrdine(
+        email: "mr.armando.sacco@gmail.com",
       ),
     );
   }
@@ -1469,68 +1469,151 @@ class _HomeOrdineState extends State<HomeOrdine> {
                   ),
                 ),
 
-                NotificationListener<DraggableScrollableNotification>(
-                  onNotification:
-                      (DraggableScrollableNotification DSNotification) {
-                    setState(() {
-                      if (DSNotification.extent == 0.1) {
-                        _dark = false;
-                      } else {
-                        _dark = true;
-                      }
-                      _opacity = DSNotification.extent;
-                    });
-                    return null;
-                  },
-                  child: DraggableScrollableSheet(
-                    initialChildSize: 0.1,
-                    minChildSize: 0.1,
-                    maxChildSize: 0.5,
-                    builder: (context, scrollController) {
-                      return NotificationListener<OverscrollIndicatorNotification>(
-                        onNotification: (overscroll) {
-                          overscroll.disallowGlow();
-                          return null;
-                        },
-                        child: SingleChildScrollView(
-                          physics: ClampingScrollPhysics(),
-                          controller: scrollController,
-                          child: Container(
-                            width: size.width,
-                            height: size.height * 0.49,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(30),
-                                  topRight: Radius.circular(30)),
-                              gradient: LinearGradient(
-                                  begin: Alignment.bottomCenter,
-                                  end: Alignment.topCenter,
-                                  colors: [colorBgApp, Colors.white]),
-                            ),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                //Top rectangle drawing
-                                Positioned(
-                                  top: size.height * 0.01,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey,
-                                      borderRadius: BorderRadius.all(Radius.circular(15)),
-                                    ),
+                DraggableScrollableSheet(
+                  initialChildSize: 0.1,
+                  minChildSize: 0.1,
+                  maxChildSize: 0.5,
+                  builder: (context, scrollController) {
+                    return NotificationListener<
+                        OverscrollIndicatorNotification>(
+                      onNotification: (overscroll) {
+                        overscroll.disallowGlow();
+                        return null;
+                      },
+                      child: SingleChildScrollView(
+                        physics: ClampingScrollPhysics(),
+                        controller: scrollController,
+                        child: Container(
+                          width: size.width,
+                          height: size.height * 0.49,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey),
+                            borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30)),
+                            gradient: LinearGradient(
+                                begin: Alignment.bottomCenter,
+                                end: Alignment.topCenter,
+                                colors: [colorBgApp, Colors.white]),
+                          ),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              //Top rectangle drawing
+                              Positioned(
+                                top: size.height * 0.015,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(15)),
+                                  ),
+                                  width: size.width * 0.15,
+                                  height: 5,
+                                ),
+                              ),
 
-                                    width: size.width * 0.2,
-                                    height: 8,
+                              //TopLeftText
+                              Positioned(
+                                top: size.height * 0.04,
+                                left: size.width * 0.05,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.shopping_bag,
+                                      color: colorBtn,
+                                    ),
+                                    Text(
+                                      " Il tuo ordine",
+                                      style: TextStyle(
+                                          fontFamily: 'Itim', fontSize: 25),
+                                    )
+                                  ],
+                                ),
+                              ),
+
+                              //TopRightBtn
+                              Positioned(
+                                top: size.height * 0.03,
+                                right: size.width * 0.05,
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  style: ButtonStyle(
+                                      backgroundColor:
+                                          MaterialStateProperty.all<Color>(
+                                              colorBtn),
+                                      shape: MaterialStateProperty.all(
+                                          RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                        side: BorderSide(color: colorBtnDark),
+                                      ))),
+                                  child: Text(
+                                    "Svuota",
+                                    style: TextStyle(
+                                        fontFamily: 'Itim', fontSize: 18),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+
+                              //TopRow drawed
+                              Positioned(
+                                top: size.height * 0.115,
+                                child: Container(
+                                  width: size.width,
+                                  height: 1,
+                                  color: Colors.grey.withOpacity(0.5),
+                                ),
+                              ),
+
+                              //Conferma ordine
+                              Positioned(
+                                bottom: size.height * 0.01,
+                                child: Container(
+                                  width: size.width * 0.9,
+                                  height: size.height * 0.07,
+                                  child: ElevatedButton(
+                                    onPressed: () {},
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateProperty.all<Color>(
+                                                colorBtn),
+                                        shape: MaterialStateProperty.all(
+                                            RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                          side: BorderSide(color: colorBtnDark),
+                                        ))),
+                                    child: Text(
+                                      "Conferma ordine",
+                                      style: TextStyle(
+                                          fontFamily: 'Itim', fontSize: 25),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              //Total amount
+                              Positioned(
+                                bottom: size.height * 0.12,
+                                child: Container(
+                                  width: size.width * 0.9,
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text("Totale", style: TextStyle(fontFamily: 'Itim', fontSize: 20),),
+                                      Text("0 €", style: TextStyle(fontFamily: 'Itim', fontSize: 20),)
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
@@ -1552,8 +1635,7 @@ class CatListView extends StatelessWidget {
           physics: const NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           scrollDirection: Axis.vertical,
-
-          itemCount: snapshot.data.length,
+          itemCount: snapshot?.data?.length ?? 0,
           itemBuilder: (context, index) {
             Pietanza p = snapshot.data[index];
             return Container(

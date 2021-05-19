@@ -1275,23 +1275,6 @@ class _HomeOrdineState extends State<HomeOrdine> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Positioned(
-                  top: 0,
-                  child: Container(
-                    width: size.width,
-                    height: size.height * 0.05 + 70,
-                    color: colorBgApp,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 50.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [],
-                      ),
-                    ),
-                  ),
-                ),
-
                 //TopLeft icon
                 Positioned(
                   top: size.height * 0.060,
@@ -1461,14 +1444,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                   ),
                 ),
 
-                //DarkBg
-                Visibility(
-                  visible: _dark,
-                  child: Container(
-                    color: Colors.black.withOpacity(_opacity),
-                  ),
-                ),
-
+                //Bottom draggableScrollableSheet
                 DraggableScrollableSheet(
                   initialChildSize: 0.1,
                   minChildSize: 0.1,
@@ -1600,10 +1576,19 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                   width: size.width * 0.9,
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text("Totale", style: TextStyle(fontFamily: 'Itim', fontSize: 20),),
-                                      Text("0 €", style: TextStyle(fontFamily: 'Itim', fontSize: 20),)
+                                      Text(
+                                        "Totale",
+                                        style: TextStyle(
+                                            fontFamily: 'Itim', fontSize: 20),
+                                      ),
+                                      Text(
+                                        "0 €",
+                                        style: TextStyle(
+                                            fontFamily: 'Itim', fontSize: 20),
+                                      )
                                     ],
                                   ),
                                 ),

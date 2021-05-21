@@ -12,6 +12,97 @@ class HomeOrdine extends StatefulWidget {
 }
 
 class _HomeOrdineState extends State<HomeOrdine> {
+  var ordine = <elementoOrdine>[];
+  bool puoiAggiungere = false;
+
+  Widget CatListView(int cat) {
+    return FutureBuilder(
+      future: Services.pietanzaDaCategoria(cat),
+      builder: (context, snapshot) {
+        return ListView.builder(
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          scrollDirection: Axis.vertical,
+          itemCount: snapshot?.data?.length ?? 0,
+          itemBuilder: (context, index) {
+            Pietanza p = snapshot.data[index];
+            return Container(
+              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
+              decoration: BoxDecoration(boxShadow: [
+                BoxShadow(
+                    color: Colors.grey.withOpacity(0.3),
+                    spreadRadius: 5,
+                    blurRadius: 10)
+              ]),
+              child: ClipRRect(
+                borderRadius: BorderRadius.all(Radius.circular(15)),
+                child: ListTile(
+                  tileColor: Colors.white,
+                  title: Text(p.nome),
+                  subtitle: Text("Qt. 0"),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("${p.prezzo.toString()} €"),
+                      IconButton(
+                        onPressed: () {
+                          //TODO aggiunge elemento all'ordine
+
+                          setState(() {
+
+                            if(ordine.isEmpty){
+                              print("Aggiungo ${p.nome}");
+                              ordine.add(elementoOrdine( p: p, n: 1 ));
+                            }else{
+
+                              for(final eo in ordine){
+                                if(eo.p.pietanza_id == p.pietanza_id){
+                                  eo.n += 1;
+                                  puoiAggiungere = false;
+                                  break;
+                                }else{
+                                  puoiAggiungere = true;
+                                }
+                              }
+                              
+                              if(puoiAggiungere){
+                                ordine.add(elementoOrdine( p: p, n: 1 ));
+                                puoiAggiungere = true;
+                              }
+                            }
+
+                            print("Ordine: ");
+                            ordine.forEach((element) {
+                              print("${element.p.nome}: ${element.n}");
+                            });
+
+                          });
+
+                        },
+                        icon: Icon(
+                          Icons.add,
+                          color: colorBtn,
+                        ),
+                        iconSize: 40,
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  String totale() {
+    double tot = 0;
+    for(final eo in ordine){
+      tot += eo.p.prezzo * eo.n;
+    }
+    return tot.toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,9 +209,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                       fontFamily: 'Itim'),
                                 ),
                               )),
-                          CatListView(
-                            cat: 0,
-                          ),
+                          CatListView(0),
 
                           //Contorni
                           Align(
@@ -136,9 +225,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                       fontFamily: 'Itim'),
                                 ),
                               )),
-                          CatListView(
-                            cat: 1,
-                          ),
+                          CatListView(1),
 
                           //Secondi
                           Align(
@@ -154,9 +241,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                       fontFamily: 'Itim'),
                                 ),
                               )),
-                          CatListView(
-                            cat: 2,
-                          ),
+                          CatListView(2),
 
                           //Bibite
                           Align(
@@ -172,9 +257,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                       fontFamily: 'Itim'),
                                 ),
                               )),
-                          CatListView(
-                            cat: 3,
-                          ),
+                          CatListView(3),
 
                           //Dolci
                           Align(
@@ -190,9 +273,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                       fontFamily: 'Itim'),
                                 ),
                               )),
-                          CatListView(
-                            cat: 4,
-                          ),
+                          CatListView(4),
                         ],
                       ),
                     ),
@@ -324,6 +405,24 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                 ),
                               ),
 
+                              //ListView ordine
+                              Positioned(
+                                top: size.height * 0.118,
+                                child: Container(
+                                  width: size.width,
+                                  height: size.height * 0.2,
+                                  child: ListView.separated(
+                                      itemBuilder:
+                                          (BuildContext context, int index) {
+                                        return Text("${ordine[index].p.nome}: ${ordine[index].n}");
+                                      },
+                                      separatorBuilder:
+                                          (BuildContext context, int index) =>
+                                              const Divider(),
+                                      itemCount: ordine.length),
+                                ),
+                              ),
+
                               //Total amount
                               Positioned(
                                 bottom: size.height * 0.12,
@@ -340,7 +439,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                             fontFamily: 'Itim', fontSize: 20),
                                       ),
                                       Text(
-                                        "0 €",
+                                        "${totale()} €",
                                         style: TextStyle(
                                             fontFamily: 'Itim', fontSize: 20),
                                       )
@@ -362,60 +461,11 @@ class _HomeOrdineState extends State<HomeOrdine> {
   }
 }
 
-class CatListView extends StatelessWidget {
-  final cat;
-  const CatListView({Key key, this.cat}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Services.pietanzaDaCategoria(cat),
-      builder: (context, snapshot) {
-        return ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          scrollDirection: Axis.vertical,
-          itemCount: snapshot?.data?.length ?? 0,
-          itemBuilder: (context, index) {
-            Pietanza p = snapshot.data[index];
-            return Container(
-              margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16),
-              decoration: BoxDecoration(boxShadow: [
-                BoxShadow(
-                    color: Colors.grey.withOpacity(0.3),
-                    spreadRadius: 5,
-                    blurRadius: 10)
-              ]),
-              child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(15)),
-                child: ListTile(
-                  tileColor: Colors.white,
-                  title: Text(p.nome),
-                  subtitle: Text("Qt. 0"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text("${p.prezzo.toString()} €"),
-                      IconButton(
-                        onPressed: () {
-                          print(p.nome);
-                        },
-                        icon: Icon(
-                          Icons.add_circle_outline,
-                          color: colorBtn,
-                        ),
-                        iconSize: 40,
-                      )
-                    ],
-                  ),
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-}
-
 //https://i.pinimg.com/originals/da/85/ef/da85ef1ffa269927371bd5e511a408ec.png
+
+class elementoOrdine {
+  Pietanza p;
+  int n;
+
+  elementoOrdine({Key key, this.p, this.n});
+}

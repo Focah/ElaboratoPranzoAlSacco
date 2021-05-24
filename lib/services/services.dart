@@ -8,6 +8,7 @@ class Services {
   static const _ACCESSO = 'ACCESSO';
   static const _ALL_CLIENTI = 'ALL_CLIENTI';
   static const _PIETANZA_DA_CATEGORIA = 'PIETANZA_DA_CATEGORIA';
+  static const _INSERIMENTO_ORDINE = 'INSERIMENTO_ORDINE';
 
   /*
   static List<Progetto> parseResponseProgetto(String responseBody){
@@ -108,6 +109,27 @@ class Services {
     }catch(e){
       print(e);
       return [];
+    }
+  }
+
+  static Future<String> inserimentoOrdine() async{
+    //TODO Da finire questa
+    try {
+      var map = Map<String, dynamic>();
+      map['action'] = _INSERIMENTO_ORDINE;
+      map['data_ora'] = 0;
+      map['importo'] = 0;
+      map['stato'] = 0;
+      map['cliente_id'] = 0;
+
+      var url = Uri.parse(ROOT);
+      final response = await http.post(url, body: map);
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      return response.body;
+    } catch (e) {
+      return "errore"; // Return an empty list on exception
     }
   }
 

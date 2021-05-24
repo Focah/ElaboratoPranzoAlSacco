@@ -18,7 +18,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static final posRistorante = LatLng(45.537918, 9.423339);
-  static final double raggioConsegna = 1000;
+  static final double raggioConsegna = 20000;
   BitmapDescriptor mapMarker;
   Timer timer;
   String testo = "";

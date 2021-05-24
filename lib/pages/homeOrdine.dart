@@ -14,8 +14,9 @@ class HomeOrdine extends StatefulWidget {
 class _HomeOrdineState extends State<HomeOrdine> {
   var ordine = <elementoOrdine>[];
   bool puoiAggiungere = false;
+  DateTime dataSelezionata = DateTime.now();
 
-  Widget CatListView(int cat) {
+  Widget _catListView(int cat) {
     return FutureBuilder(
       future: Services.pietanzaDaCategoria(cat),
       builder: (context, snapshot) {
@@ -38,35 +39,39 @@ class _HomeOrdineState extends State<HomeOrdine> {
                 borderRadius: BorderRadius.all(Radius.circular(15)),
                 child: ListTile(
                   tileColor: Colors.white,
-                  title: Text(p.nome),
-                  subtitle: Text("Qt. 0"),
+                  title: Text(
+                    p.nome,
+                    style: TextStyle(fontSize: 19, fontFamily: 'Itim'),
+                  ),
+                  //subtitle: Text("Qt. 0"),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text("${p.prezzo.toString()} €"),
+                      Text(
+                        "${p.prezzo.toString()} €",
+                        style: TextStyle(fontSize: 15, fontFamily: 'Itim'),
+                      ),
                       IconButton(
                         onPressed: () {
                           //TODO aggiunge elemento all'ordine
 
                           setState(() {
-
-                            if(ordine.isEmpty){
+                            if (ordine.isEmpty) {
                               print("Aggiungo ${p.nome}");
-                              ordine.add(elementoOrdine( p: p, n: 1 ));
-                            }else{
-
-                              for(final eo in ordine){
-                                if(eo.p.pietanza_id == p.pietanza_id){
+                              ordine.add(elementoOrdine(p: p, n: 1));
+                            } else {
+                              for (final eo in ordine) {
+                                if (eo.p.pietanza_id == p.pietanza_id) {
                                   eo.n += 1;
                                   puoiAggiungere = false;
                                   break;
-                                }else{
+                                } else {
                                   puoiAggiungere = true;
                                 }
                               }
-                              
-                              if(puoiAggiungere){
-                                ordine.add(elementoOrdine( p: p, n: 1 ));
+
+                              if (puoiAggiungere) {
+                                ordine.add(elementoOrdine(p: p, n: 1));
                                 puoiAggiungere = true;
                               }
                             }
@@ -75,9 +80,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                             ordine.forEach((element) {
                               print("${element.p.nome}: ${element.n}");
                             });
-
                           });
-
                         },
                         icon: Icon(
                           Icons.add,
@@ -96,13 +99,32 @@ class _HomeOrdineState extends State<HomeOrdine> {
     );
   }
 
-  String totale() {
+  String _totale() {
     double tot = 0;
-    for(final eo in ordine){
+    for (final eo in ordine) {
       tot += eo.p.prezzo * eo.n;
     }
+
+    ordine.sort((elementoOrdine a, elementoOrdine b) =>
+        a.p.pietanza_id.compareTo(b.p.pietanza_id));
+
     return tot.toString();
   }
+
+  //TODO cambiare e usare il puckage del link sotto
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime selezionata = await showDatePicker(
+        context: context,
+        initialDate: dataSelezionata,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (selezionata != null &&  selezionata != dataSelezionata)
+      setState(() {
+        dataSelezionata = selezionata;
+      });
+  }
+
+  //https://pub.dev/packages/flutter_datetime_picker
 
   @override
   Widget build(BuildContext context) {
@@ -184,9 +206,9 @@ class _HomeOrdineState extends State<HomeOrdine> {
 
                 //MainContainer
                 Positioned(
-                  bottom: size.height * 0.1,
+                  bottom: size.height * 0.11,
                   child: Container(
-                    height: size.height * 0.75,
+                    height: size.height * 0.74,
                     width: size.width * 0.95,
                     child:
                         NotificationListener<OverscrollIndicatorNotification>(
@@ -194,87 +216,91 @@ class _HomeOrdineState extends State<HomeOrdine> {
                         overscroll.disallowGlow();
                         return null;
                       },
-                      child: ListView(
-                        children: [
-                          //Pizze
-                          Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.only(left: 18),
-                                child: Text(
-                                  "Pizze",
-                                  style: TextStyle(
-                                      color: colorBtn,
-                                      fontSize: 25,
-                                      fontFamily: 'Itim'),
-                                ),
-                              )),
-                          CatListView(0),
+                      child: MediaQuery.removePadding(
+                        removeTop: true,
+                        context: context,
+                        child: ListView(
+                          children: [
+                            //Pizze
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(left: 18),
+                                  child: Text(
+                                    "Pizze",
+                                    style: TextStyle(
+                                        color: colorBtn,
+                                        fontSize: 25,
+                                        fontFamily: 'Itim'),
+                                  ),
+                                )),
+                            _catListView(0),
 
-                          //Contorni
-                          Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 18, top: 5),
-                                child: Text(
-                                  "Contorni",
-                                  style: TextStyle(
-                                      color: colorBtn,
-                                      fontSize: 25,
-                                      fontFamily: 'Itim'),
-                                ),
-                              )),
-                          CatListView(1),
+                            //Contorni
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 18, top: 5),
+                                  child: Text(
+                                    "Contorni",
+                                    style: TextStyle(
+                                        color: colorBtn,
+                                        fontSize: 25,
+                                        fontFamily: 'Itim'),
+                                  ),
+                                )),
+                            _catListView(1),
 
-                          //Secondi
-                          Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 18, top: 5),
-                                child: Text(
-                                  "Secondi",
-                                  style: TextStyle(
-                                      color: colorBtn,
-                                      fontSize: 25,
-                                      fontFamily: 'Itim'),
-                                ),
-                              )),
-                          CatListView(2),
+                            //Secondi
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 18, top: 5),
+                                  child: Text(
+                                    "Secondi",
+                                    style: TextStyle(
+                                        color: colorBtn,
+                                        fontSize: 25,
+                                        fontFamily: 'Itim'),
+                                  ),
+                                )),
+                            _catListView(2),
 
-                          //Bibite
-                          Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 18, top: 5),
-                                child: Text(
-                                  "Bibite",
-                                  style: TextStyle(
-                                      color: colorBtn,
-                                      fontSize: 25,
-                                      fontFamily: 'Itim'),
-                                ),
-                              )),
-                          CatListView(3),
+                            //Bibite
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 18, top: 5),
+                                  child: Text(
+                                    "Bibite",
+                                    style: TextStyle(
+                                        color: colorBtn,
+                                        fontSize: 25,
+                                        fontFamily: 'Itim'),
+                                  ),
+                                )),
+                            _catListView(3),
 
-                          //Dolci
-                          Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 18, top: 5),
-                                child: Text(
-                                  "Dolci",
-                                  style: TextStyle(
-                                      color: colorBtn,
-                                      fontSize: 25,
-                                      fontFamily: 'Itim'),
-                                ),
-                              )),
-                          CatListView(4),
-                        ],
+                            //Dolci
+                            Align(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 18, top: 5),
+                                  child: Text(
+                                    "Dolci",
+                                    style: TextStyle(
+                                        color: colorBtn,
+                                        fontSize: 25,
+                                        fontFamily: 'Itim'),
+                                  ),
+                                )),
+                            _catListView(4),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -295,6 +321,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                       child: SingleChildScrollView(
                         physics: ClampingScrollPhysics(),
                         controller: scrollController,
+
                         child: Container(
                           width: size.width,
                           height: size.height * 0.49,
@@ -350,7 +377,11 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                 top: size.height * 0.03,
                                 right: size.width * 0.05,
                                 child: ElevatedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    setState(() {
+                                      ordine.clear();
+                                    });
+                                  },
                                   style: ButtonStyle(
                                       backgroundColor:
                                           MaterialStateProperty.all<Color>(
@@ -385,7 +416,9 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                   width: size.width * 0.9,
                                   height: size.height * 0.07,
                                   child: ElevatedButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      //TODO mandare ordine al db, da fare accettare poi dal commesso nel sito
+                                    },
                                     style: ButtonStyle(
                                         backgroundColor:
                                             MaterialStateProperty.all<Color>(
@@ -405,27 +438,135 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                 ),
                               ),
 
+                              //DatePicker
+                              Positioned(
+                                top: size.height * 0.018,
+                                right: size.width * 0.355,
+                                height: size.width * 0.12,
+                                width: size.width * 0.12,
+                                child: IconButton(
+                                  onPressed: () => _selectDate(context),
+                                  icon: Icon(Icons.calendar_today_sharp),
+                                  iconSize: 30,
+                                  color: colorBtnDark,
+                                ),
+                              ),
+
+                              //DateText
+                              Positioned(
+                                top: size.height * 0.07,
+                                right: size.width * 0.305,
+                               child: Text("${dataSelezionata.toLocal()}".split(' ')[0], style: TextStyle(fontSize: 17, fontFamily: 'Itim'),),
+                              ),
+
                               //ListView ordine
                               Positioned(
                                 top: size.height * 0.118,
                                 child: Container(
+                                  //color: Colors.green,
                                   width: size.width,
-                                  height: size.height * 0.2,
-                                  child: ListView.separated(
-                                      itemBuilder:
-                                          (BuildContext context, int index) {
-                                        return Text("${ordine[index].p.nome}: ${ordine[index].n}");
-                                      },
-                                      separatorBuilder:
-                                          (BuildContext context, int index) =>
-                                              const Divider(),
-                                      itemCount: ordine.length),
+                                  height: size.height * 0.22,
+                                  child: MediaQuery.removePadding(
+                                    removeTop: true,
+                                    context: context,
+                                    child: ordine.isNotEmpty
+                                        ? ListView.builder(
+                                            itemBuilder: (BuildContext context,
+                                                int index) {
+                                              elementoOrdine eo = ordine[index];
+                                              return Container(
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16,
+                                                        vertical: 5),
+                                                decoration: BoxDecoration(
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                          color: Colors.grey
+                                                              .withOpacity(0.3),
+                                                          spreadRadius: 5,
+                                                          blurRadius: 10)
+                                                    ]),
+                                                child: ClipRRect(
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(15)),
+                                                  child: ListTile(
+                                                    tileColor: Colors.white,
+                                                    title: Text(
+                                                      eo.p.nome,
+                                                      style: TextStyle(
+                                                          fontSize: 17,
+                                                          fontFamily: 'Itim'),
+                                                    ),
+                                                    subtitle: Text(
+                                                      "Qt. ${eo.n}",
+                                                      style: TextStyle(
+                                                          fontSize: 15,
+                                                          fontFamily: 'Itim'),
+                                                    ),
+                                                    dense: true,
+                                                    trailing: Row(
+                                                      mainAxisSize:
+                                                          MainAxisSize.min,
+                                                      children: [
+                                                        Text(
+                                                          "${eo.p.prezzo.toString()} €",
+                                                          style: TextStyle(
+                                                              fontSize: 15,
+                                                              fontFamily:
+                                                                  'Itim'),
+                                                        ),
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            //TODO rimuove quantità
+                                                            setState(() {
+                                                              if (eo.n > 1) {
+                                                                eo.n -= 1;
+                                                              } else {
+                                                                ordine
+                                                                    .remove(eo);
+                                                              }
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.remove,
+                                                            color: colorBtn,
+                                                          ),
+                                                          iconSize: 30,
+                                                        ),
+                                                        IconButton(
+                                                          onPressed: () {
+                                                            //TODO aggiunge quantità
+                                                            setState(() {
+                                                              eo.n += 1;
+                                                            });
+                                                          },
+                                                          icon: Icon(
+                                                            Icons.add,
+                                                            color: colorBtn,
+                                                          ),
+                                                          iconSize: 30,
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            itemCount: ordine.length)
+                                        : Container(
+                                      child: Center(
+                                        child: Text("Il carrello è vuoto...", style: TextStyle(fontSize: 20, fontFamily: 'Itim'),),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
 
                               //Total amount
                               Positioned(
-                                bottom: size.height * 0.12,
+                                bottom: size.height * 0.10,
                                 child: Container(
                                   width: size.width * 0.9,
                                   child: Row(
@@ -439,7 +580,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                             fontFamily: 'Itim', fontSize: 20),
                                       ),
                                       Text(
-                                        "${totale()} €",
+                                        "${_totale()} €",
                                         style: TextStyle(
                                             fontFamily: 'Itim', fontSize: 20),
                                       )

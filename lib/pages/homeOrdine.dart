@@ -1,6 +1,7 @@
 import 'package:elaborato_delivery_app/services/consts.dart';
 import 'package:elaborato_delivery_app/services/services.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 //Pagina per creare il proprio ordine
 class HomeOrdine extends StatefulWidget {
@@ -15,6 +16,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
   var ordine = <elementoOrdine>[];
   bool puoiAggiungere = false;
   DateTime dataSelezionata = DateTime.now();
+  TimeOfDay orarioSelezionato = TimeOfDay.now();
 
   Widget _catListView(int cat) {
     return FutureBuilder(
@@ -111,17 +113,31 @@ class _HomeOrdineState extends State<HomeOrdine> {
     return tot.toString();
   }
 
-  //TODO cambiare e usare il puckage del link sotto
+  //TODO cambiare e usare il package del link sotto
   Future<void> _selectDate(BuildContext context) async {
     final DateTime selezionata = await showDatePicker(
         context: context,
         initialDate: dataSelezionata,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (selezionata != null &&  selezionata != dataSelezionata)
+    if (selezionata != null && selezionata != dataSelezionata)
       setState(() {
         dataSelezionata = selezionata;
       });
+  }
+
+  Future _pickTime(BuildContext context) async{
+    final initialTime = TimeOfDay.now();
+    final newTime = await showTimePicker(
+      context: context,
+      initialTime: orarioSelezionato ?? initialTime,
+    );
+
+    if(newTime == null) return;
+
+    //TODO controllo che l'orario selezionato sia dopo l'orario attuale se la data è oggi
+
+    setState(() => orarioSelezionato = newTime);
   }
 
   //https://pub.dev/packages/flutter_datetime_picker
@@ -143,30 +159,57 @@ class _HomeOrdineState extends State<HomeOrdine> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                //TopLeft icon
+                //DatePicker
                 Positioned(
-                  top: size.height * 0.060,
-                  left: size.width * 0.05,
+                  top: size.height * 0.055,
+                  left: size.width * 0.09,
+                  height: size.width * 0.12,
+                  width: size.width * 0.12,
                   child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.home),
-                    color: colorBtn,
-                    iconSize: 40,
+                    onPressed: () => _selectDate(context),
+                    icon: Icon(Icons.calendar_today_sharp),
+                    iconSize: 30,
+                    color: colorBtnDark,
                   ),
                 ),
 
-                //TopRight icon
+                //DateText
                 Positioned(
-                  top: size.height * 0.060,
-                  right: size.width * 0.05,
+                  top: size.height * 0.105,
+                  left: size.width * 0.045,
+                  child: GestureDetector(
+                      onTap: () => _selectDate(context),
+                      child: Text(
+                        "${DateFormat('dd-MM-yyyy').format(dataSelezionata.toLocal())}",
+                        style: TextStyle(fontSize: 17, fontFamily: 'Itim'),
+                      )),
+                ),
+
+                //TimePicker
+                Positioned(
+                  top: size.height * 0.046,
+                  right: size.width * 0.073,
+                  height: size.width * 0.12,
+                  width: size.width * 0.12,
                   child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.account_circle,
-                      color: colorBtn,
+                    onPressed: () => _pickTime(context),
+                    icon: IconButton(
+                      icon: Icon(Icons.timer, color: colorBtnDark,),
+                      iconSize: 32,
                     ),
-                    iconSize: 40,
                   ),
+                ),
+
+                //TimeText
+                Positioned(
+                  top: size.height * 0.105,
+                  right: size.width * 0.058,
+                  child: GestureDetector(
+                      onTap: () => _pickTime(context),
+                      child: Text(
+                        "${orarioSelezionato.hour}:${orarioSelezionato.minute}",
+                        style: TextStyle(fontSize: 18, fontFamily: 'Itim'),
+                      )),
                 ),
 
                 //TopText
@@ -178,28 +221,10 @@ class _HomeOrdineState extends State<HomeOrdine> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        "Pranzo al Sacco",
+                        "    Pranzo al Sacco",
                         style: TextStyle(
                             color: colorBtn, fontSize: 25, fontFamily: 'Itim'),
                       ),
-                      SizedBox(
-                        height: size.height * 0.005,
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.timer,
-                            color: Colors.grey,
-                          ),
-                          Text(
-                            " 13:00 - 13:30",
-                            style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 18,
-                                fontFamily: 'Itim'),
-                          )
-                        ],
-                      )
                     ],
                   ),
                 ),
@@ -321,7 +346,6 @@ class _HomeOrdineState extends State<HomeOrdine> {
                       child: SingleChildScrollView(
                         physics: ClampingScrollPhysics(),
                         controller: scrollController,
-
                         child: Container(
                           width: size.width,
                           height: size.height * 0.49,
@@ -438,27 +462,6 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                 ),
                               ),
 
-                              //DatePicker
-                              Positioned(
-                                top: size.height * 0.018,
-                                right: size.width * 0.355,
-                                height: size.width * 0.12,
-                                width: size.width * 0.12,
-                                child: IconButton(
-                                  onPressed: () => _selectDate(context),
-                                  icon: Icon(Icons.calendar_today_sharp),
-                                  iconSize: 30,
-                                  color: colorBtnDark,
-                                ),
-                              ),
-
-                              //DateText
-                              Positioned(
-                                top: size.height * 0.07,
-                                right: size.width * 0.305,
-                               child: Text("${dataSelezionata.toLocal()}".split(' ')[0], style: TextStyle(fontSize: 17, fontFamily: 'Itim'),),
-                              ),
-
                               //ListView ordine
                               Positioned(
                                 top: size.height * 0.118,
@@ -556,10 +559,15 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                             },
                                             itemCount: ordine.length)
                                         : Container(
-                                      child: Center(
-                                        child: Text("Il carrello è vuoto...", style: TextStyle(fontSize: 20, fontFamily: 'Itim'),),
-                                      ),
-                                    ),
+                                            child: Center(
+                                              child: Text(
+                                                "Il carrello è vuoto...",
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontFamily: 'Itim'),
+                                              ),
+                                            ),
+                                          ),
                                   ),
                                 ),
                               ),

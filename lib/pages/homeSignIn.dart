@@ -22,6 +22,24 @@ class _HomeSignInState extends State<HomeSignIn> {
 
   bool _obscurePass = true;
 
+  _showDialog(BuildContext context) {
+    VoidCallback continueCallBack = () {
+      Navigator.of(context).pop();
+        //TODO andare alla pagina di "Attendere"
+      };
+
+      BlurryDialog alert = BlurryDialog("Cambio password",
+          "Ti abbiamo inviato una email all'indirizzo di posta elettronica, continua la procedura di cambio password al link nella email.", continueCallBack, 1);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+
+  }
+
   @override
   void initState() {
     if (widget.email != null) {
@@ -96,13 +114,13 @@ class _HomeSignInState extends State<HomeSignIn> {
                       height: size.height * 0.08,
                       child: Center(
                           child: Text(
-                            "Non hai un account? Registrati qui",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 17,
-                                fontFamily: 'Itim',
-                                fontWeight: FontWeight.bold),
-                          )),
+                        "Non hai un account? Registrati qui",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontFamily: 'Itim',
+                            fontWeight: FontWeight.bold),
+                      )),
                     ),
                   ),
                 ),
@@ -115,7 +133,7 @@ class _HomeSignInState extends State<HomeSignIn> {
                   child: ElevatedButton(
                     style: ButtonStyle(
                         backgroundColor:
-                        MaterialStateProperty.all<Color>(colorBtn),
+                            MaterialStateProperty.all<Color>(colorBtn),
                         shape: MaterialStateProperty.all(RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                           side: BorderSide(color: colorBtnDark),
@@ -133,8 +151,8 @@ class _HomeSignInState extends State<HomeSignIn> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => HomePage(
-                                      email: email,
-                                    )));
+                                          email: email,
+                                        )));
                           }
                         });
                       }
@@ -153,9 +171,18 @@ class _HomeSignInState extends State<HomeSignIn> {
                 //PassDimenticata
                 Positioned(
                   bottom: size.height * 0.22,
-                  child: Text(
-                    "Password dimenticata?",
-                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  child: GestureDetector(
+                    onTap: (){
+                      if(emailTfController.text.isNotEmpty){
+                        Services.passwordReset(emailTfController.text).then((value){
+                          _showDialog(context);
+                        });
+                      }
+                    },
+                    child: Text(
+                      "Password dimenticata?",
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
                   ),
                 ),
 
@@ -206,7 +233,7 @@ class _HomeSignInState extends State<HomeSignIn> {
                               border: UnderlineInputBorder(),
                               hintText: "Inserisci Password",
                               hintStyle:
-                              TextStyle(fontFamily: 'Itim', fontSize: 18),
+                                  TextStyle(fontFamily: 'Itim', fontSize: 18),
                             ),
                           ),
                         ),

@@ -13,6 +13,7 @@ class Services {
   static const _INSERIMENTO_ORDINE = 'INSERIMENTO_ORDINE';
   static const _CLIENTE_FROM_EMAIL = 'CLIENTE_FROM_EMAIL';
   static const _AGGIUNGI_PIETANZA_ORDINE = 'AGGIUNGI_PIETANZA_ORDINE';
+  static const _PASSWORD_RESET = 'PASSWORD_RESET';
 
   /*
   static List<Progetto> parseResponseProgetto(String responseBody){
@@ -22,12 +23,7 @@ class Services {
   */
 
   static Future<String> nuovoUtente(
-      String nome,
-      String cognome,
-      String username,
-      String email,
-      String password,
-      String numero_cell) async {
+      String nome, String cognome, String username, String email, String password, String numero_cell) async {
     try {
       var map = Map<String, dynamic>();
       map['action'] = _NUOVO_UTENTE;
@@ -55,6 +51,23 @@ class Services {
       map['action'] = _ACCESSO;
       map['email'] = email;
       map['password'] = password;
+
+      var url = Uri.parse(ROOT);
+      final response = await http.post(url, body: map);
+
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+      return response.body;
+    } catch (e) {
+      return "errore";
+    }
+  }
+
+  static Future<String> passwordReset(String email) async{
+    try {
+      var map = Map<String, dynamic>();
+      map['action'] = _PASSWORD_RESET;
+      map['email'] = email;
 
       var url = Uri.parse(ROOT);
       final response = await http.post(url, body: map);
@@ -222,11 +235,6 @@ class Services {
     }
   }
 
-  static Future<http.Response> fetchAddress(double lat, double lng) {
-    var apiKey = '9c545acb3ed945c2a26029ce219c0be3';
-    return http.get(Uri.parse(
-        'https://api.opencagedata.com/geocode/v1/json?q=$lat+$lng&key=$apiKey'));
-  }
 }
 
 class Cliente {

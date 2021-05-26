@@ -58,8 +58,8 @@ class MyApp extends StatelessWidget {
             900: const Color(0xFFB32520),
           }),
           accentColor: colorGreen),
-      home: HomeOrdine(
-        email: "mr.armando.sacco@gmail.com",
+      home: HomeAuth(
+        //email: "mr.armando.sacco@gmail.com",
       ),
     );
   }

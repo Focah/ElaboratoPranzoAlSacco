@@ -10,8 +10,8 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:io';
-import '../services/consts.dart';
-import '../services/services.dart';
+import 'services/consts.dart';
+import 'services/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
@@ -58,7 +58,7 @@ class MyApp extends StatelessWidget {
             900: const Color(0xFFB32520),
           }),
           accentColor: colorGreen),
-      home: HomeAuth(
+      home: SplashScreen(
         //email: "mr.armando.sacco@gmail.com",
       ),
     );

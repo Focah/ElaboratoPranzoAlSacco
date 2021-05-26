@@ -1,3 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
+import 'dart:ui';
+
+import 'package:elaborato_delivery_app/pages/homeOrdineAttendere.dart';
 import 'package:elaborato_delivery_app/services/consts.dart';
 import 'package:elaborato_delivery_app/services/services.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +22,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
   bool puoiAggiungere = false;
   DateTime dataSelezionata = DateTime.now();
   TimeOfDay orarioSelezionato = TimeOfDay.now();
+  Cliente cliente;
 
   Widget _catListView(int cat) {
     return FutureBuilder(
@@ -113,7 +119,6 @@ class _HomeOrdineState extends State<HomeOrdine> {
     return tot.toString();
   }
 
-  //TODO cambiare e usare il package del link sotto
   Future<void> _selectDate(BuildContext context) async {
     final DateTime selezionata = await showDatePicker(
         context: context,
@@ -126,21 +131,74 @@ class _HomeOrdineState extends State<HomeOrdine> {
       });
   }
 
-  Future _pickTime(BuildContext context) async{
+  Future _pickTime(BuildContext context) async {
     final initialTime = TimeOfDay.now();
     final newTime = await showTimePicker(
       context: context,
       initialTime: orarioSelezionato ?? initialTime,
     );
 
-    if(newTime == null) return;
+    if (newTime == null) return;
 
     //TODO controllo che l'orario selezionato sia dopo l'orario attuale se la data è oggi
 
-    setState(() => orarioSelezionato = newTime);
+    setState(() {
+      orarioSelezionato = newTime;
+    });
   }
 
-  //https://pub.dev/packages/flutter_datetime_picker
+  _showDialog(BuildContext context) {
+    VoidCallback continueCallBack = () {
+      Navigator.of(context).pop();
+
+      Services.inserimentoOrdine(dataSelezionata, orarioSelezionato,
+              double.parse(_totale()), cliente.cliente_id)
+          .then((value) {
+        int ordine_id;
+        var valueDecoded = json.decode(value);
+        for (var c in valueDecoded) {
+          ordine_id = int.parse(c['ordine_id']);
+        }
+        for (var p in ordine) {
+          Services.aggiungiPietanzaOrdine(p.n, p.p.pietanza_id, ordine_id).then((value){
+            print("value: ${value}");
+          });
+        }
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HomeOrdineAttendere(
+                  email: widget.email,
+                )));
+
+        //TODO andare alla pagina di "Attendere"
+      });
+    };
+
+    if (double.parse(_totale()) > 0.0) {
+      BlurryDialog alert = BlurryDialog("Confermare l'ordine?",
+          "Sei sicuro di voler confermare l'ordine?", continueCallBack, 0);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    //Prendere il client_id dalla mail
+    Services.clienteById(widget.email).then((value) {
+      setState(() {
+        cliente = value;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +252,10 @@ class _HomeOrdineState extends State<HomeOrdine> {
                   child: IconButton(
                     onPressed: () => _pickTime(context),
                     icon: IconButton(
-                      icon: Icon(Icons.timer, color: colorBtnDark,),
+                      icon: Icon(
+                        Icons.timer,
+                        color: colorBtnDark,
+                      ),
                       iconSize: 32,
                     ),
                   ),
@@ -207,7 +268,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                   child: GestureDetector(
                       onTap: () => _pickTime(context),
                       child: Text(
-                        "${orarioSelezionato.hour}:${orarioSelezionato.minute}",
+                        "${orarioSelezionato.hour}:${(orarioSelezionato.minute).toString().padLeft(2, '0')}",
                         style: TextStyle(fontSize: 18, fontFamily: 'Itim'),
                       )),
                 ),
@@ -333,8 +394,8 @@ class _HomeOrdineState extends State<HomeOrdine> {
 
                 //Bottom draggableScrollableSheet
                 DraggableScrollableSheet(
-                  initialChildSize: 0.1,
-                  minChildSize: 0.1,
+                  initialChildSize: 0.11,
+                  minChildSize: 0.11,
                   maxChildSize: 0.5,
                   builder: (context, scrollController) {
                     return NotificationListener<
@@ -442,6 +503,7 @@ class _HomeOrdineState extends State<HomeOrdine> {
                                   child: ElevatedButton(
                                     onPressed: () {
                                       //TODO mandare ordine al db, da fare accettare poi dal commesso nel sito
+                                      _showDialog(context);
                                     },
                                     style: ButtonStyle(
                                         backgroundColor:

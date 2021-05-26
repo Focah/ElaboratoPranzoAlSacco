@@ -18,11 +18,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static final posRistorante = LatLng(45.537918, 9.423339);
-  static final double raggioConsegna = 20000;
+  static final double raggioConsegna = 9000;
   BitmapDescriptor mapMarker;
   Timer timer;
-  String testo = "";
-  bool show = false;
 
   Set<Marker> _markers = {
     Marker(
@@ -105,6 +103,22 @@ class _HomePageState extends State<HomePage> {
     return 12742 * asin(sqrt(a));
   }
 
+  _showDialog(BuildContext context) {
+    VoidCallback continueCallBack = () {
+      Navigator.of(context).pop();
+    };
+
+    BlurryDialog alert = BlurryDialog("Siamo spiacenti",
+        "Non effettuiamo consegne alla sua posizione.", continueCallBack, 1);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   void initState() {
     //setCustomMarker();
@@ -145,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                     markers: _markers,
                     circles: _circles,
                     initialCameraPosition:
-                    CameraPosition(target: posRistorante, zoom: 14),
+                        CameraPosition(target: posRistorante, zoom: 14),
                   ),
                 ),
 
@@ -172,12 +186,10 @@ class _HomePageState extends State<HomePage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => HomeOrdine(
-                                        email: widget.email,
-                                      )));
+                                            email: widget.email,
+                                          )));
                             } else {
-                              show = true;
-                              testo =
-                              "Non puoi ordinare! Sei fuori dal raggio di consegna del ristorante";
+                              _showDialog(context);
                             }
                           });
                         });
@@ -194,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                             ),
                             borderRadius: BorderRadius.circular(30.0)),
                         constraints:
-                        BoxConstraints(maxWidth: 250.0, minHeight: 50.0),
+                            BoxConstraints(maxWidth: 250.0, minHeight: 50.0),
                         alignment: Alignment.center,
                         child: Text(
                           "Ordina",
@@ -206,23 +218,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                  ),
-                ),
-
-                //Testo in sovraimpressione
-                Visibility(
-                  visible: show,
-                  child: Positioned(
-                    top: size.height * 0.18,
-                    child: Container(
-                        width: size.width * 0.75,
-                        child: Text(
-                          testo,
-                          style: TextStyle(
-                            fontFamily: 'Itim',
-                            fontSize: 30,
-                          ),
-                        )),
                   ),
                 ),
               ],

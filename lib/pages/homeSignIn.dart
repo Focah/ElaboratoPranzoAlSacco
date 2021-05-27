@@ -25,19 +25,21 @@ class _HomeSignInState extends State<HomeSignIn> {
   _showDialog(BuildContext context) {
     VoidCallback continueCallBack = () {
       Navigator.of(context).pop();
-        //TODO andare alla pagina di "Attendere"
-      };
+      //TODO andare alla pagina di "Attendere"
+    };
 
-      BlurryDialog alert = BlurryDialog("Cambio password",
-          "Ti abbiamo inviato una email all'indirizzo di posta elettronica, continua la procedura di cambio password al link nella email.", continueCallBack, 1);
+    BlurryDialog alert = BlurryDialog(
+        "Cambio password",
+        "Ti abbiamo inviato una email all'indirizzo di posta elettronica, continua la procedura di cambio password al link nella email.",
+        continueCallBack,
+        1);
 
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return alert;
-        },
-      );
-
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   @override
@@ -172,9 +174,10 @@ class _HomeSignInState extends State<HomeSignIn> {
                 Positioned(
                   bottom: size.height * 0.22,
                   child: GestureDetector(
-                    onTap: (){
-                      if(emailTfController.text.isNotEmpty){
-                        Services.passwordReset(emailTfController.text).then((value){
+                    onTap: () {
+                      if (emailTfController.text.isNotEmpty) {
+                        Services.passwordReset(emailTfController.text)
+                            .then((value) {
                           _showDialog(context);
                         });
                       }

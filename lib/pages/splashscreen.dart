@@ -15,6 +15,8 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    //Dopo due secondi dall'inizializzazione della pagina,
+    //passa alla schermata successiva
     Timer(Duration(seconds: 2), () {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => HomeAuth()));
@@ -25,6 +27,9 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
+    //Scaffold è il widget che da la struttura base di una pagina
+    //a cui si puo aggiungere un appBar, un Drawer, un FloatingActionButton
+    //ecc
     return Scaffold(
       body: Center(
         child: Image(

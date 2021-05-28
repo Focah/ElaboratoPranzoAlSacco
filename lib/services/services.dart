@@ -48,11 +48,11 @@ class Services {
   static Future<String> accesso(String email, String password) async {
     try {
       var map = Map<String, dynamic>();
-      map['action'] = _ACCESSO;
+      map['action'] = "ACCESSO";
       map['email'] = email;
       map['password'] = password;
 
-      var url = Uri.parse(ROOT);
+      var url = Uri.parse('https://www.bushido-team.com/Elaborato/service.php');
       final response = await http.post(url, body: map);
 
       print('Response status: ${response.statusCode}');

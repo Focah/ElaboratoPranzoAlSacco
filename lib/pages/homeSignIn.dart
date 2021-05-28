@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 //Pagina Login
 class HomeSignIn extends StatefulWidget {
   final email;
+
   const HomeSignIn({Key key, this.email}) : super(key: key);
 
   @override
@@ -111,7 +112,6 @@ class _HomeSignInState extends State<HomeSignIn> {
                           borderRadius: BorderRadius.only(
                               topLeft: Radius.circular(50),
                               topRight: Radius.circular(50))),
-                      //color: Color(0xFF4058DB),
                       width: size.width,
                       height: size.height * 0.08,
                       child: Center(
@@ -141,14 +141,14 @@ class _HomeSignInState extends State<HomeSignIn> {
                           side: BorderSide(color: colorBtnDark),
                         ))),
                     onPressed: () {
-                      print("Pressed ACCEDI");
+                      //Premuto il pulsante Accedi
                       if (_formKey.currentState.validate()) {
-                        print("Validato");
+                        //Form validato
                         var email = emailTfController.text;
                         var password = pass1TfController.text;
                         Services.accesso(email, password).then((value) {
                           if (value.contains("Login effettuato")) {
-                            print("Loggato");
+                            //Il form PHP interogato con email e password ha risposto che sono corretti
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(

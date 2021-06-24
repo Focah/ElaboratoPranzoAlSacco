@@ -1,6 +1,8 @@
 import 'package:elaborato_delivery_app/services/consts.dart';
 import 'package:flutter/material.dart';
 
+import 'homeOrdine.dart';
+
 class HomeOrdineAttendere extends StatefulWidget {
   final email;
   const HomeOrdineAttendere({Key key, this.email}) : super(key: key);
@@ -16,6 +18,12 @@ class _HomeOrdineAttendereState extends State<HomeOrdineAttendere> {
 
     return WillPopScope(
       onWillPop: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HomeOrdine(
+                  email: widget.email,
+                )));
         return null;
       },
       child: Scaffold(
